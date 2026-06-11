@@ -7849,7 +7849,7 @@ static status_t validateScreenshotPermissions(const CaptureArgs& captureArgs) {
 }
 
 void SurfaceFlinger::setSchedFifo(bool enabled, const char* whence) {
-    static constexpr int kFifoPriority = 3;
+    static constexpr int kFifoPriority = 6; // Moderately boosted to prioritize UI without starving audio/system
     static constexpr int kOtherPriority = 0;
 
     struct sched_param param = {0};
