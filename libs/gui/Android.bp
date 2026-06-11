@@ -408,6 +408,9 @@ cc_defaults {
     },
 
     cflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
         "-DANDROID_UTILS_REF_BASE_DISABLE_IMPLICIT_CONSTRUCTION",
         "-Wthread-safety",
     ],
@@ -425,6 +428,9 @@ cc_library_static {
     min_sdk_version: "29",
 
     cflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
         "-DNO_BINDER",
     ],
 
@@ -479,11 +485,17 @@ cc_defaults {
     defaults: ["android.hardware.graphics.common-ndk_shared"],
 
     cflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
         "-Wall",
         "-Werror",
     ],
 
     cppflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
         "-Wextra",
         "-DDEBUG_ONLY_CODE=0",
     ],
@@ -491,6 +503,9 @@ cc_defaults {
     product_variables: {
         eng: {
             cppflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
                 "-UDEBUG_ONLY_CODE",
                 "-DDEBUG_ONLY_CODE=1",
             ],

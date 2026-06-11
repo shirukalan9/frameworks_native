@@ -185,6 +185,9 @@ cc_library_static {
     name: "libinput_from_rust_to_cpp",
     host_supported: true,
     cflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
         "-Wall",
         "-Werror",
         "-Wextra",
@@ -211,6 +214,9 @@ cc_library {
     name: "libinput",
     host_supported: true,
     cflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
         "-DANDROID_UTILS_REF_BASE_DISABLE_IMPLICIT_CONSTRUCTION",
         "-Wall",
         "-Werror",
@@ -342,6 +348,9 @@ cc_library_static {
     generated_sources: ["statslog_libinput.cpp"],
     generated_headers: ["statslog_libinput.h"],
     cflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
         "-Wall",
         "-Werror",
     ],

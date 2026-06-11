@@ -38,10 +38,16 @@ cc_library_headers {
 cc_defaults {
     name: "libui-defaults",
     cflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
         "-Wall",
         "-Werror",
     ],
     cppflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
         "-Wextra",
     ],
 
@@ -108,6 +114,9 @@ cc_library_shared {
     double_loadable: true,
 
     cflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
         "-Wall",
         "-Werror",
     ] + select(soong_config_variable("libui", "additional_gralloc_10_usage_bits"), {
@@ -115,6 +124,9 @@ cc_library_shared {
         default: ["-DADDNL_GRALLOC_10_USAGE_BITS=0"],
     }),
     cppflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
         "-Wextra",
     ],
 
@@ -201,7 +213,10 @@ cc_library_shared {
     // bufferhub is not used when building libgui for vendors
     target: {
         vendor: {
-            cflags: ["-DLIBUI_IN_VNDK"],
+            cflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing","-DLIBUI_IN_VNDK"],
             exclude_srcs: [
             ],
             exclude_header_libs: [
@@ -250,7 +265,10 @@ cc_library_headers {
     vendor_available: true,
     target: {
         vendor: {
-            cflags: ["-DLIBUI_IN_VNDK"],
+            cflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing","-DLIBUI_IN_VNDK"],
             override_export_include_dirs: ["include_vndk"],
         },
     },
@@ -274,7 +292,10 @@ cc_library_headers {
 cc_defaults {
     name: "libui-validate-regions-defaults",
     shared_libs: ["libutilscallstack"],
-    cflags: ["-DVALIDATE_REGIONS"],
+    cflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing","-DVALIDATE_REGIONS"],
 }
 
 subdirs = [
