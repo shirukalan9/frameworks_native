@@ -249,6 +249,10 @@ bool Region::contains(const Point& point) const {
 }
 
 bool Region::contains(int x, int y) const {
+    const Rect& b = getBounds();
+    if (y < b.top || y >= b.bottom || x < b.left || x >= b.right) {
+        return false; // FAST O(1) EXIT if outside overall bounds
+    }
     const_iterator cur = begin();
     const_iterator const tail = end();
     while (cur != tail) {
