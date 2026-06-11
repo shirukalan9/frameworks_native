@@ -483,10 +483,10 @@ CONSTEXPR TMat44<T> TMat44<T>::perspective(T fov, T aspect, T near, T far, TMat4
     T w;
 
     if (direction == TMat44::Fov::VERTICAL) {
-        h = std::tan(fov * M_PI / 360.0f) * near;
+        h = std::tan(fov * (M_PI / 360.0)) * near;
         w = h * aspect;
     } else {
-        w = std::tan(fov * M_PI / 360.0f) * near;
+        w = std::tan(fov * (M_PI / 360.0)) * near;
         h = w / aspect;
     }
     return frustum(-w, w, -h, h, near, far);

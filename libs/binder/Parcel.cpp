@@ -2217,10 +2217,10 @@ status_t Parcel::readAligned(T *pArg) const {
     static_assert(PAD_SIZE_UNSAFE(sizeof(T)) == sizeof(T));
     static_assert(std::is_trivially_copyable_v<T>);
 
-    if ((mDataPos+sizeof(T)) <= mDataSize) {
+    if ((mDataPos+sizeof(T)) <= mDataSize) [[likely]] {
         if (objectsCount() > 0) {
             status_t err = validateReadData(mDataPos + sizeof(T));
-            if(err != NO_ERROR) {
+            if(err != NO_ERROR) [[unlikely]] {
                 // Still increment the data position by the expected length
                 mDataPos += sizeof(T);
                 return err;
@@ -2250,9 +2250,9 @@ status_t Parcel::writeAligned(T val) {
     static_assert(PAD_SIZE_UNSAFE(sizeof(T)) == sizeof(T));
     static_assert(std::is_trivially_copyable_v<T>);
 
-    if ((mDataPos+sizeof(val)) <= mDataCapacity) {
+    if ((mDataPos+sizeof(val)) <= mDataCapacity) [[likely]] {
 restart_write:
-        if (status_t status = validateReadData(mDataPos + sizeof(val)); status != OK) {
+        if (status_t status = validateReadData(mDataPos + sizeof(val)); status != OK) [[unlikely]] {
             return status;
         }
 

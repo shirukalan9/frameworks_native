@@ -373,11 +373,11 @@ static std::atomic<bool> gDisableBackgroundScheduling = false;
 
 IPCThreadState* IPCThreadState::self()
 {
-    if (gHaveTLS.load(std::memory_order_acquire)) {
+    if (gHaveTLS.load(std::memory_order_acquire)) [[likely]] {
 restart:
         const pthread_key_t k = gTLS;
         IPCThreadState* st = (IPCThreadState*)pthread_getspecific(k);
-        if (st) return st;
+        if (st) [[likely]] return st;
         return new IPCThreadState;
     }
 
@@ -398,7 +398,7 @@ restart:
 
 IPCThreadState* IPCThreadState::selfOrNull()
 {
-    if (gHaveTLS.load(std::memory_order_acquire)) {
+    if (gHaveTLS.load(std::memory_order_acquire)) [[likely]] {
         const pthread_key_t k = gTLS;
         IPCThreadState* st = (IPCThreadState*)pthread_getspecific(k);
         return st;
