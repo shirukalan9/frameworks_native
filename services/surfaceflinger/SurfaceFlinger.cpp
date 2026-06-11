@@ -10610,7 +10610,7 @@ void SurfaceFlinger::updateHdrInfos(
         hdrInfosForDisplay.emplace_or_replace(display->getId());
     }
 
-    static constexpr auto kLayerCapacity = 20;
+    static constexpr auto kLayerCapacity = 48; // Increased inline capacity: reduces heap spills for HDR layer tracking
     ftl::SmallMap<int32_t, ftl::Unit, kLayerCapacity> hdrLayersWithSdrDisplays;
     ftl::SmallMap<int32_t, ftl::Unit, kLayerCapacity> hdrLayersWithHdrDisplays;
 
