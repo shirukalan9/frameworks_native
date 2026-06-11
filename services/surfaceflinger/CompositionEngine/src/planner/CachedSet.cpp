@@ -138,6 +138,7 @@ bool CachedSet::hasReadyBuffer() const {
 
 std::vector<CachedSet> CachedSet::decompose() const {
     std::vector<CachedSet> layers;
+    layers.reserve(mLayers.size());
 
     std::transform(mLayers.begin(), mLayers.end(), std::back_inserter(layers),
                    [](Layer layer) { return CachedSet(std::move(layer)); });
@@ -192,6 +193,7 @@ void CachedSet::render(renderengine::RenderEngine& renderEngine, TexturePool& te
                            .treat170mAsSrgb = outputState.treat170mAsSrgb};
 
     std::vector<renderengine::LayerSettings> layerSettings;
+    layerSettings.reserve(mLayers.size());
     renderengine::LayerSettings highlight;
     for (const auto& layer : mLayers) {
         auto blurSettings = targetSettings;

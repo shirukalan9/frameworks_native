@@ -262,9 +262,9 @@ NonBufferHash Flattener::computeLayersHash() const{
 bool Flattener::mergeWithCachedSets(const std::vector<const LayerState*>& layers, time_point now) {
     SFTRACE_CALL();
     std::vector<CachedSet> merged;
+    merged.reserve(layers.size());
 
     if (mLayers.empty()) {
-        merged.reserve(layers.size());
         for (const LayerState* layer : layers) {
             merged.emplace_back(layer, now);
             mFlattenedDisplayCost += merged.back().getDisplayCost();
