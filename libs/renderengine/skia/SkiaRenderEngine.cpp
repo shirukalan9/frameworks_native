@@ -947,7 +947,9 @@ void SkiaRenderEngine::drawLayersInternal(
         }
         // Layers have a local transform that should be applied to them
         SkMatrix positionTransform = getSkM44(layer.geometry.positionTransform).asM33();
-        canvas->concat(positionTransform);
+        if (CC_UNLIKELY(!positionTransform.isIdentity())) {
+            canvas->concat(positionTransform);
+        }
 
         const auto [bounds, roundRectClip] =
                 getBoundsAndClip(layer.geometry.boundaries, layer.geometry.roundedCornersCrop,

@@ -679,7 +679,7 @@ std::vector<TouchedWindow> getHoveringWindowsLocked(const TouchState* oldState,
             TouchedWindow touchedWindow;
             touchedWindow.windowHandle = oldWindow;
             touchedWindow.dispatchMode = InputTarget::DispatchMode::HOVER_EXIT;
-            out.push_back(touchedWindow);
+            out.push_back(std::move(touchedWindow));
         }
     }
 
@@ -715,7 +715,7 @@ std::vector<TouchedWindow> getHoveringWindowsLocked(const TouchState* oldState,
         if (canReceiveForegroundTouches(*newWindow->getInfo())) {
             touchedWindow.targetFlags |= InputTarget::Flags::FOREGROUND;
         }
-        out.push_back(touchedWindow);
+        out.push_back(std::move(touchedWindow));
     }
     return out;
 }
@@ -3059,7 +3059,7 @@ void InputDispatcher::addFocusInputMonitoringTargetsLocked(std::vector<InputTarg
                                           target.rawTransform =
                                                   mWindowInfos.getDisplayTransform(displayId);
                                           target.setDefaultPointerTransform(target.rawTransform);
-                                          inputTargets.push_back(target);
+                                          inputTargets.push_back(std::move(target));
                                       });
 }
 
