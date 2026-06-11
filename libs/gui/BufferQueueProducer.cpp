@@ -546,7 +546,7 @@ status_t BufferQueueProducer::dequeueBuffer(int* outSlot, sp<android::Fence>* ou
             // waitForFreeSlotThenRelock must have returned a slot containing a
             // buffer. If this buffer would require reallocation to meet the
             // requested attributes, we free it and attempt to get another one.
-            if (!mCore->mAllowAllocation) {
+            if (CC_UNLIKELY(!mCore->mAllowAllocation)) {
                 if (buffer->needsReallocation(width, height, format, BQ_LAYER_COUNT, usage)) {
                     if (mCore->mSharedBufferSlot == found) {
                         BQ_LOGE("dequeueBuffer: cannot re-allocate a sharedbuffer");
@@ -560,6 +560,7 @@ status_t BufferQueueProducer::dequeueBuffer(int* outSlot, sp<android::Fence>* ou
             }
         }
 
+        auto& slot = mCore->mSlots[found]; // Cache slot reference to avoid repeated array lookups
         const sp<GraphicBuffer>& buffer(mSlots[found].mGraphicBuffer);
 
         bool needsReallocation = buffer == nullptr ||
@@ -581,12 +582,12 @@ status_t BufferQueueProducer::dequeueBuffer(int* outSlot, sp<android::Fence>* ou
         *outSlot = found;
         ATRACE_BUFFER_INDEX(found);
 
-        attachedByConsumer = mSlots[found].mNeedsReallocation;
-        mSlots[found].mNeedsReallocation = false;
+        attachedByConsumer = slot.mNeedsReallocation;
+        slot.mNeedsReallocation = false;
 
-        mSlots[found].mBufferState.dequeue();
+        slot.mBufferState.dequeue();
 
-        if (needsReallocation) {
+        if (CC_UNLIKELY(needsReallocation)) {
             if (CC_UNLIKELY(ATRACE_ENABLED())) {
                 if (buffer == nullptr) {
                     ATRACE_FORMAT_INSTANT("%s buffer reallocation: null", mConsumerName.c_str());
@@ -601,14 +602,14 @@ status_t BufferQueueProducer::dequeueBuffer(int* outSlot, sp<android::Fence>* ou
                                           buffer->getLayerCount(), buffer->getUsage());
                 }
             }
-            mSlots[found].mAcquireCalled = false;
-            mSlots[found].mGraphicBuffer = nullptr;
-            mSlots[found].mRequestBufferCalled = false;
+            slot.mAcquireCalled = false;
+            slot.mGraphicBuffer = nullptr;
+            slot.mRequestBufferCalled = false;
 #if !COM_ANDROID_GRAPHICS_LIBGUI_FLAGS(BQ_GL_FENCE_CLEANUP)
-            mSlots[found].mEglDisplay = EGL_NO_DISPLAY;
-            mSlots[found].mEglFence = EGL_NO_SYNC_KHR;
+            slot.mEglDisplay = EGL_NO_DISPLAY;
+            slot.mEglFence = EGL_NO_SYNC_KHR;
 #endif
-            mSlots[found].mFence = Fence::NO_FENCE;
+            slot.mFence = Fence::NO_FENCE;
             mCore->mBufferAge = 0;
             mCore->mIsAllocating = true;
 #if COM_ANDROID_GRAPHICS_LIBGUI_FLAGS(BQ_EXTENDEDALLOCATE)
@@ -620,38 +621,38 @@ status_t BufferQueueProducer::dequeueBuffer(int* outSlot, sp<android::Fence>* ou
         } else {
             // We add 1 because that will be the frame number when this buffer
             // is queued
-            mCore->mBufferAge = mCore->mFrameCounter + 1 - mSlots[found].mFrameNumber;
+            mCore->mBufferAge = mCore->mFrameCounter + 1 - slot.mFrameNumber;
         }
 
         BQ_LOGV("dequeueBuffer: setting buffer age to %" PRIu64,
                 mCore->mBufferAge);
 
-        if (CC_UNLIKELY(mSlots[found].mFence == nullptr)) {
+        if (CC_UNLIKELY(slot.mFence == nullptr)) {
             BQ_LOGE("dequeueBuffer: about to return a NULL fence - "
                     "slot=%d w=%d h=%d format=%u",
                     found, buffer->width, buffer->height, buffer->format);
         }
 
 #if !COM_ANDROID_GRAPHICS_LIBGUI_FLAGS(BQ_GL_FENCE_CLEANUP)
-        eglDisplay = mSlots[found].mEglDisplay;
-        eglFence = mSlots[found].mEglFence;
+        eglDisplay = slot.mEglDisplay;
+        eglFence = slot.mEglFence;
 #endif
         // Don't return a fence in shared buffer mode, except for the first
         // frame.
         *outFence = (mCore->mSharedBufferMode &&
                 mCore->mSharedBufferSlot == found) ?
-                Fence::NO_FENCE : mSlots[found].mFence;
+                Fence::NO_FENCE : slot.mFence;
 #if !COM_ANDROID_GRAPHICS_LIBGUI_FLAGS(BQ_GL_FENCE_CLEANUP)
-        mSlots[found].mEglFence = EGL_NO_SYNC_KHR;
+        slot.mEglFence = EGL_NO_SYNC_KHR;
 #endif
-        mSlots[found].mFence = Fence::NO_FENCE;
+        slot.mFence = Fence::NO_FENCE;
 
         // If shared buffer mode has just been enabled, cache the slot of the
         // first buffer that is dequeued and mark it as the shared buffer.
         if (mCore->mSharedBufferMode && mCore->mSharedBufferSlot ==
                 BufferQueueCore::INVALID_BUFFER_SLOT) {
             mCore->mSharedBufferSlot = found;
-            mSlots[found].mBufferState.mShared = true;
+            slot.mBufferState.mShared = true;
         }
 
         if (!(returnFlags & BUFFER_NEEDS_REALLOCATION)) {
