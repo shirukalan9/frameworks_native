@@ -28,6 +28,9 @@ cc_aconfig_library {
 cc_defaults {
     name: "surfaceflinger_defaults",
     cflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
         "-DANDROID_UTILS_REF_BASE_DISABLE_IMPLICIT_CONSTRUCTION",
         "-DLOG_TAG=\"SurfaceFlinger\"",
         "-Wall",
@@ -64,6 +67,9 @@ cc_defaults {
         "surfaceflinger_defaults",
     ],
     cflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
         "-DEGL_EGLEXT_PROTOTYPES",
         "-DGL_GLEXT_PROTOTYPES",
     ] + select(soong_config_variable("qtidisplay", "headers_namespace"), {
@@ -300,6 +306,9 @@ cc_defaults {
         "surfaceflinger_defaults",
     ],
     cflags: [
+        "-O3",
+        "-g0",
+        "-fstrict-aliasing",
         "-DLOG_TAG=\"SurfaceFlinger\"",
     ],
     shared_libs: [
