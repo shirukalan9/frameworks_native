@@ -120,7 +120,7 @@ BufferQueueCore::BufferQueueCore()
         mAllowExtendedSlotCount(false),
 #endif
         mMaxBufferCount(BufferQueueDefs::NUM_BUFFER_SLOTS),
-        mMaxAcquiredBufferCount(1),
+        mMaxAcquiredBufferCount(2), // Increased from 1: extra buffer depth reduces frame drops on 8GB+ devices
         mMaxDequeuedBufferCount(1),
         mBufferHasBeenQueued(false),
         mFrameCounter(0),
