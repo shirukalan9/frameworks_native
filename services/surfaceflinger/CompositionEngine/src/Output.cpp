@@ -1545,8 +1545,6 @@ renderengine::DisplaySettings Output::generateClientCompositionDisplaySettings(
 std::vector<LayerFE::LayerSettings> Output::generateClientCompositionRequests(
       bool supportsProtectedContent, ui::Dataspace outputDataspace, std::vector<LayerFE*>& outLayerFEs) {
     std::vector<LayerFE::LayerSettings> clientCompositionLayers;
-    clientCompositionLayers.reserve(getOutputLayersOrderedByZ().size());
-    outLayerFEs.reserve(getOutputLayersOrderedByZ().size());
     ALOGV("Rendering client layers");
 
     const auto& outputState = getState();
