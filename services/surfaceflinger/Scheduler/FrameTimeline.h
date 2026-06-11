@@ -382,7 +382,7 @@ private:
     std::map<int64_t, TimelineItem> mPredictions GUARDED_BY(mMutex);
     int64_t mCurrentToken GUARDED_BY(mMutex);
     mutable std::mutex mMutex;
-    static constexpr size_t kMaxTokens = 500;
+    static constexpr size_t kMaxTokens = 250; // Reduced from 500: 250 tokens covers >2s at 120Hz, sufficient for any use case
 };
 
 class FrameTimeline : public android::scheduler::FrameTimeline {
@@ -556,7 +556,7 @@ private:
     nsecs_t mPreviousActualPresentTime = 0;
     nsecs_t mPreviousPredictionPresentTime = 0;
     const JankClassificationThresholds mJankClassificationThresholds;
-    static constexpr uint32_t kDefaultMaxDisplayFrames = 64;
+    static constexpr uint32_t kDefaultMaxDisplayFrames = 32; // Reduced from 64: 32 frames is sufficient history for jank detection
     // The initial container size for the vector<SurfaceFrames> inside display frame. Although
     // this number doesn't represent any bounds on the number of surface frames that can go in a
     // display frame, this is a good starting size for the vector so that we can avoid the
