@@ -181,6 +181,7 @@ bool SensorService::SensorEventConnection::removeSensor(int32_t handle) {
 std::vector<int32_t> SensorService::SensorEventConnection::getActiveSensorHandles() const {
     Mutex::Autolock _l(mConnectionLock);
     std::vector<int32_t> list;
+    list.reserve(mSensorInfo.size());
     for (auto& it : mSensorInfo) {
         list.push_back(it.first);
     }
@@ -216,8 +217,9 @@ String8 SensorService::SensorEventConnection::getPackageName() const {
 void SensorService::SensorEventConnection::setFirstFlushPending(int32_t handle,
                                 bool value) {
     Mutex::Autolock _l(mConnectionLock);
-    if (mSensorInfo.count(handle) > 0) {
-        FlushInfo& flushInfo = mSensorInfo[handle];
+    auto it = mSensorInfo.find(handle);
+    if (it != mSensorInfo.end()) {
+        FlushInfo& flushInfo = it->second;
         flushInfo.mFirstFlushPending = value;
     }
 }
@@ -276,8 +278,9 @@ void SensorService::SensorEventConnection::updateLooperRegistrationLocked(
 bool SensorService::SensorEventConnection::incrementPendingFlushCountIfHasAccess(int32_t handle) {
     if (hasSensorAccess()) {
         Mutex::Autolock _l(mConnectionLock);
-        if (mSensorInfo.count(handle) > 0) {
-            FlushInfo& flushInfo = mSensorInfo[handle];
+        auto it = mSensorInfo.find(handle);
+        if (it != mSensorInfo.end()) {
+            FlushInfo& flushInfo = it->second;
             flushInfo.mPendingFlushEventsToSend++;
         }
         return true;
@@ -311,12 +314,13 @@ status_t SensorService::SensorEventConnection::sendEvents(
 
             // Check if this connection has registered for this sensor. If not continue to the
             // next sensor_event.
-            if (mSensorInfo.count(sensor_handle) == 0) {
+            auto it = mSensorInfo.find(sensor_handle);
+            if (it == mSensorInfo.end()) {
                 ++i;
                 continue;
             }
 
-            FlushInfo& flushInfo = mSensorInfo[sensor_handle];
+            FlushInfo& flushInfo = it->second;
             // Check if there is a pending flush_complete event for this sensor on this connection.
             if (buffer[i].type == SENSOR_TYPE_META_DATA && flushInfo.mFirstFlushPending == true &&
                     mapFlushEventsToConnections[i] == this) {
@@ -649,13 +653,14 @@ void SensorService::SensorEventConnection::countFlushCompleteEventsLocked(
     // separately before the next batch of events.
     for (int j = 0; j < numEventsDropped; ++j) {
         if (scratch[j].type == SENSOR_TYPE_META_DATA) {
-            if (mSensorInfo.count(scratch[j].meta_data.sensor) == 0) {
+            auto it = mSensorInfo.find(scratch[j].meta_data.sensor);
+            if (it == mSensorInfo.end()) {
                 ALOGW("%s: sensor 0x%x is not found in connection",
                       __func__, scratch[j].meta_data.sensor);
                 continue;
             }
 
-            FlushInfo& flushInfo = mSensorInfo[scratch[j].meta_data.sensor];
+            FlushInfo& flushInfo = it->second;
             flushInfo.mPendingFlushEventsToSend++;
             ALOGD_IF(DEBUG_CONNECTIONS, "increment pendingFlushCount %d",
                      flushInfo.mPendingFlushEventsToSend);

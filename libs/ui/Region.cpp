@@ -252,6 +252,7 @@ bool Region::contains(int x, int y) const {
     const_iterator cur = begin();
     const_iterator const tail = end();
     while (cur != tail) {
+        if (y < cur->top) break; // EARLY EXIT: Regions are strictly sorted top-to-bottom
         if (y >= cur->top && y < cur->bottom && x >= cur->left && x < cur->right) {
             return true;
         }
