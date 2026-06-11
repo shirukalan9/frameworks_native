@@ -771,6 +771,9 @@ protected:
     mutable std::mutex mDebugMutex;
     String8 mDebugName GUARDED_BY(mDebugMutex) = String8("not-connected");
     uint64_t mId GUARDED_BY(mDebugMutex) = 0;
+
+    pid_t mPid;
+    bool mIsSurfaceFlinger;
 };
 
 } // namespace android
