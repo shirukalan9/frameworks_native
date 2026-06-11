@@ -2364,18 +2364,25 @@ int Surface::connect(int api, const sp<SurfaceListener>& listener, bool reportBu
             : (ipc != nullptr)?ipc->getCallingPid():-1;
 
         // We've got caller PID. Now checking whether it is surfaceflinger
-        char cmdline[128];
+        char cmdline[128] = {0};
         char path[128];
         snprintf(path, sizeof(path)-1, "/proc/%d/cmdline", mPid);
         int fd = open(path, O_RDONLY);
-        read(fd, cmdline, sizeof(cmdline)-1);
+        if (fd >= 0) {
+            ssize_t bytesRead = read(fd, cmdline, sizeof(cmdline)-1);
+            if (bytesRead > 0) {
+                cmdline[bytesRead] = 0;
+            } else {
+                cmdline[0] = 0;
+            }
+            close(fd);
+        }
+        
         // Normally cmdline is already \0-separated, but well
         for(unsigned i=0; i<sizeof(cmdline); i++)
             if(cmdline[i] == '\n')
                 cmdline[i] = 0;
         cmdline[sizeof(cmdline)-1] = 0;
-
-        close(fd);
 
         // Truncate to last / (also called basename)
         const char *c = strrchr(cmdline, '/');
