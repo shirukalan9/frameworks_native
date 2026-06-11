@@ -560,7 +560,7 @@ status_t BufferQueueProducer::dequeueBuffer(int* outSlot, sp<android::Fence>* ou
             }
         }
 
-        auto& slot = mCore->mSlots[found]; // Cache slot reference to avoid repeated array lookups
+        auto& slot = mSlots[found]; // Cache slot reference to avoid repeated array lookups
         const sp<GraphicBuffer>& buffer(mSlots[found].mGraphicBuffer);
 
         bool needsReallocation = buffer == nullptr ||
