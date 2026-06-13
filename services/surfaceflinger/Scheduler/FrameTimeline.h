@@ -382,7 +382,7 @@ private:
     std::map<int64_t, TimelineItem> mPredictions GUARDED_BY(mMutex);
     int64_t mCurrentToken GUARDED_BY(mMutex);
     mutable std::mutex mMutex;
-    static constexpr size_t kMaxTokens = 250; // Reduced from 500: 250 tokens covers >2s at 120Hz, sufficient for any use case
+    static constexpr size_t kMaxTokens = 180; // Reduced from 500: 180 tokens covers 1.5s at 120Hz, and 3s at 60Hz. Balanced for memory saving.
 };
 
 class FrameTimeline : public android::scheduler::FrameTimeline {
