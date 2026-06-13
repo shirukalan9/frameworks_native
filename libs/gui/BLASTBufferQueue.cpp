@@ -22,6 +22,7 @@
 
 #include <com_android_graphics_libgui_flags.h>
 #include <cutils/atomic.h>
+#include <cutils/compiler.h>
 #include <ftl/fake_guard.h>
 #include <gui/BLASTBufferQueue.h>
 #include <gui/BufferItemConsumer.h>
@@ -581,7 +582,7 @@ status_t BLASTBufferQueue::acquireNextBufferLocked(
     // Even with this check, the consumer can fail to acquire an additional buffer if the consumer
     // has already acquired (mMaxAcquiredBuffers + 1) and the new buffer is not droppable. In this
     // case mBufferItemConsumer->acquireBuffer will return with NO_BUFFER_AVAILABLE.
-    if (mNumFrameAvailable == 0) {
+    if (CC_UNLIKELY(mNumFrameAvailable == 0)) {
         BQA_LOGV("Can't acquire next buffer. No available frames");
         return BufferQueue::NO_BUFFER_AVAILABLE;
     }
@@ -609,7 +610,7 @@ status_t BLASTBufferQueue::acquireNextBufferLocked(
 
     status_t status =
             mBufferItemConsumer->acquireBuffer(&bufferItem, 0 /* expectedPresent */, false);
-    if (status == BufferQueue::NO_BUFFER_AVAILABLE) {
+    if (CC_UNLIKELY(status == BufferQueue::NO_BUFFER_AVAILABLE)) {
         BQA_LOGV("Failed to acquire a buffer, err=NO_BUFFER_AVAILABLE");
         return status;
     } else if (status != OK) {
@@ -627,7 +628,7 @@ status_t BLASTBufferQueue::acquireNextBufferLocked(
         return BAD_VALUE;
     }
 
-    if (rejectBuffer(bufferItem)) {
+    if (CC_UNLIKELY(rejectBuffer(bufferItem))) {
         BQA_LOGE("rejecting buffer:active_size=%dx%d, requested_size=%dx%d "
                  "buffer{size=%dx%d transform=%d}",
                  mSize.width, mSize.height, mRequestedSize.width, mRequestedSize.height,

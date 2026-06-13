@@ -546,7 +546,7 @@ status_t BufferQueueProducer::dequeueBuffer(int* outSlot, sp<android::Fence>* ou
             // waitForFreeSlotThenRelock must have returned a slot containing a
             // buffer. If this buffer would require reallocation to meet the
             // requested attributes, we free it and attempt to get another one.
-            if (!mCore->mAllowAllocation) {
+            if (CC_UNLIKELY(!mCore->mAllowAllocation)) {
                 if (buffer->needsReallocation(width, height, format, BQ_LAYER_COUNT, usage)) {
                     if (mCore->mSharedBufferSlot == found) {
                         BQ_LOGE("dequeueBuffer: cannot re-allocate a sharedbuffer");
@@ -586,7 +586,7 @@ status_t BufferQueueProducer::dequeueBuffer(int* outSlot, sp<android::Fence>* ou
 
         mSlots[found].mBufferState.dequeue();
 
-        if (needsReallocation) {
+        if (CC_UNLIKELY(needsReallocation)) {
             if (CC_UNLIKELY(ATRACE_ENABLED())) {
                 if (buffer == nullptr) {
                     ATRACE_FORMAT_INSTANT("%s buffer reallocation: null", mConsumerName.c_str());

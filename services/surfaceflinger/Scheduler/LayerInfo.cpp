@@ -410,12 +410,13 @@ LayerInfo::RefreshRateVotes LayerInfo::getRefreshRateVote(nsecs_t now) {
 }
 
 const char* LayerInfo::getTraceTag(LayerHistory::LayerVoteType type) const {
-    if (mTraceTags.count(type) == 0) {
+    auto it = mTraceTags.find(type);
+    if (it == mTraceTags.end()) {
         auto tag = "LFPS " + mName + " " + ftl::enum_string(type);
-        mTraceTags.emplace(type, std::move(tag));
+        it = mTraceTags.emplace(type, std::move(tag)).first;
     }
 
-    return mTraceTags.at(type).c_str();
+    return it->second.c_str();
 }
 
 LayerInfo::FrameRate LayerInfo::getSetFrameRateVote() const {
